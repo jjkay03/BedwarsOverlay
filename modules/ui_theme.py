@@ -86,6 +86,11 @@ def fkdr_color(v: float) -> str:
     return C_DIM
 
 
+# Returns a hex color for a given winstreak value
+def ws_color(ws: int) -> str:
+    return "#ffd60a" if ws > 4 else C_DIM
+
+
 # Returns a hex color matching the player's star prestige tier
 def star_color(s: int) -> str:
     if s >= 1000:

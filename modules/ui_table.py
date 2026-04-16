@@ -9,7 +9,7 @@ from .ui_theme import (
     C_BG, C_BAR, C_BORDER, C_HEADER, C_ROW_ODD, C_ROW_EVEN,
     C_TEXT, C_DIM, C_ACCENT, MC_RED, GHOST_BG,
     FONT_HEADER, ROW_H, SCROLLBAR_W,
-    COLUMNS, fkdr_color, star_color,
+    COLUMNS, fkdr_color, star_color, ws_color,
 )
 
 CELL_PAD = 4
@@ -18,7 +18,7 @@ MAX_ROWS = 16
 
 # Sortable, scrollable grid of player BedWars stats
 class PlayerTable(ctk.CTkFrame):
-    def __init__(self, master, sort_col: str = "fkdr", sort_asc: bool = False,
+    def __init__(self, master, sort_col: str = "stars", sort_asc: bool = False,
                  font_family: str = "Segoe UI", **kw):
         super().__init__(master, fg_color=C_BG, corner_radius=0, **kw)
         self._sort_col    = sort_col
@@ -249,7 +249,7 @@ def _resolve(player: dict, key: str, loading: bool, error) -> tuple:
 def _fmt(p: dict, key: str) -> tuple:
     if key == "stars":
         s = p.get("stars", 0)
-        return f"{s}✫", star_color(s)
+        return f"[{s}✫]", star_color(s)
     if key == "fkdr":
         v = p.get("fkdr", 0.0)
         return f"{v:.2f}", fkdr_color(v)
@@ -257,5 +257,5 @@ def _fmt(p: dict, key: str) -> tuple:
         return str(p.get("wins", 0)), C_TEXT
     if key == "winstreak":
         ws = p.get("winstreak", 0)
-        return (str(ws), fkdr_color(ws / 5)) if ws > 0 else (str(ws), C_DIM)
+        return str(ws), ws_color(ws)
     return str(p.get(key, "")), C_TEXT
