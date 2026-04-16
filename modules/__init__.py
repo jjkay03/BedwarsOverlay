@@ -2,6 +2,7 @@
 
 from .api import *
 from .config import *
+from .hotkey import *
 from .log_watcher import *
 from .parser import *
 from .ui_app import *

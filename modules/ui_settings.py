@@ -1,7 +1,9 @@
-# Modal settings dialog for API key, log path, pin, and opacity.
+# Modal settings dialog for API key, log path, pin, hotkey, font, and opacity.
 
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import filedialog
+from pathlib import Path
 
 import customtkinter as ctk
 
@@ -22,13 +24,16 @@ class SettingsDialog(ctk.CTkToplevel):
         self._on_save = on_save
 
         self.title("Settings")
-        self.geometry("460x400")
+        self.geometry("460x540")
         self.resizable(False, False)
         self.configure(fg_color=C_BG)
         self.attributes("-topmost", True)
         self.grab_set()
         self.focus()
         self.after(50, self.lift)
+        _ico = Path(__file__).parent.parent / "assets" / "bed.ico"
+        if _ico.exists():
+            self.after(200, lambda: self.iconbitmap(str(_ico)))
         self._build()
 
     # Constructs all widgets inside the dialog
@@ -85,7 +90,37 @@ class SettingsDialog(ctk.CTkToplevel):
             font=ctk.CTkFont(*FONT_STATUS),
         ).pack(anchor="w", padx=18, pady=(12, 0))
 
-        # Opacity – its own row below pin
+        # Hotkey – label + small entry on the same row
+        hot_row = ctk.CTkFrame(self, fg_color="transparent")
+        hot_row.pack(fill="x", padx=18, pady=(8, 0))
+        ctk.CTkLabel(
+            hot_row, text="Toggle hotkey",
+            font=ctk.CTkFont(*FONT_STATUS), text_color=C_DIM, anchor="w",
+        ).pack(side="left")
+        self._hotkey_var = tk.StringVar(value=self._cfg.get("hotkey", "j"))
+        ctk.CTkEntry(
+            hot_row, textvariable=self._hotkey_var, width=40, height=28,
+            font=ctk.CTkFont(*FONT_STATUS),
+            fg_color=C_BAR, border_color=C_BORDER,
+        ).pack(side="left", padx=(10, 0))
+
+        # Font – label above, combobox below
+        ctk.CTkLabel(self, text="Table font",
+                     font=ctk.CTkFont(*FONT_STATUS), text_color=C_DIM, anchor="w",
+                     ).pack(fill="x", padx=18, pady=(10, 4))
+        _fonts = sorted(f for f in tkfont.families() if not f.startswith("@"))
+        self._font_box = ctk.CTkComboBox(
+            self, values=_fonts,
+            font=ctk.CTkFont(*FONT_STATUS),
+            fg_color=C_BAR, border_color=C_BORDER,
+            button_color=C_HEADER, button_hover_color=C_BORDER,
+            dropdown_fg_color=C_BAR, dropdown_hover_color=C_HEADER,
+            height=34,
+        )
+        self._font_box.set(self._cfg.get("font", "Segoe UI"))
+        self._font_box.pack(fill="x", padx=18)
+
+        # Opacity – its own row below font
         ctk.CTkLabel(self, text="Opacity",
                      font=ctk.CTkFont(*FONT_STATUS), text_color=C_DIM, anchor="w",
                      ).pack(fill="x", padx=18, pady=(10, 4))
@@ -106,7 +141,7 @@ class SettingsDialog(ctk.CTkToplevel):
 
         # Save / Cancel
         btn_row = ctk.CTkFrame(self, fg_color="transparent")
-        btn_row.pack(fill="x", padx=18, pady=(24, 18))
+        btn_row.pack(fill="x", padx=18, pady=(16, 16))
 
         ctk.CTkButton(
             btn_row, text="Cancel", width=80, height=34,
@@ -133,9 +168,12 @@ class SettingsDialog(ctk.CTkToplevel):
 
     # Writes edited values to config.json and calls the save callback
     def _save(self) -> None:
+        raw = self._hotkey_var.get().strip().lower()
         self._cfg["api_key"]  = self._key_var.get().strip()
         self._cfg["log_path"] = self._path_var.get().strip()
         self._cfg["pin"]      = self._pin_var.get()
+        self._cfg["hotkey"]   = raw[0] if raw and raw[0].isalpha() else "j"
+        self._cfg["font"]     = self._font_box.get() or "Segoe UI"
         self._cfg["opacity"]  = _OP_KEYS.get(self._opacity_btn.get(), "solid")
         config.save(self._cfg)
         self._on_save(self._cfg)

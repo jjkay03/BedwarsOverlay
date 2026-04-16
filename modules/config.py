@@ -1,4 +1,4 @@
-# Loads and saves config.json (api_key, log_path, pin, opacity) next to the project root.
+# Loads and saves config.json next to the project root.
 import json
 import os
 from pathlib import Path
@@ -22,7 +22,9 @@ DEFAULTS: dict = {
     "api_key":  "",
     "log_path": _default_log_path(),
     "pin":      True,
-    "opacity":  "solid",
+    "opacity":  "semi",
+    "font":     "Segoe UI",
+    "hotkey":   "j",
 }
 
 
