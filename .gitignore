@@ -1,6 +1,3 @@
-# Ignore files
-config.json
-
 # Ignore everything in folders
 modules/__pycache__/*
-temp/*
+data/*

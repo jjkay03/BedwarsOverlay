@@ -1,9 +1,10 @@
-# Loads and saves config.json next to the project root.
+# Loads and saves config.json inside the data/ folder.
 import json
 import os
 from pathlib import Path
 
-CONFIG_FILE = Path(__file__).parent.parent / "config.json"
+_DATA_DIR   = Path(__file__).parent.parent / "data"
+CONFIG_FILE = _DATA_DIR / "config.json"
 
 _APPDATA = os.getenv("APPDATA", "")
 _HOME    = Path.home()
@@ -29,6 +30,7 @@ DEFAULTS: dict = {
 
 
 def load() -> dict:
+    _DATA_DIR.mkdir(exist_ok=True)
     if CONFIG_FILE.exists():
         try:
             with CONFIG_FILE.open("r", encoding="utf-8") as f:

@@ -5,7 +5,7 @@ from typing import Optional
 
 import requests
 
-_CACHE_DIR = Path(__file__).parent.parent / "temp" / "heads"
+_CACHE_DIR = Path(__file__).parent.parent / "data" / "heads"
 _SIZE      = 24   # pixels – mc-heads.net accepts a size suffix
 _TIMEOUT   = 5
 

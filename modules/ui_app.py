@@ -58,7 +58,7 @@ class App(ctk.CTk):
     # Configures the root window geometry
     def _setup_window(self) -> None:
         self.title("BedWars Overlay")
-        self.geometry("490x380")
+        self.geometry("600x450")
         self.minsize(360, 200)
         self.configure(fg_color=C_BG)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
