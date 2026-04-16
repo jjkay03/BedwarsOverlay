@@ -126,7 +126,10 @@ class _PoolRow:
         self._cells: list = []
 
         for key, _, min_w, stretch, anchor in COLUMNS:
-            if key == "name":
+            if key == "head":
+                cell = _HeadCell(self.frame, bg, min_w)
+                cell.wrapper.pack(side="left", fill="y", padx=(CELL_PAD, 0))
+            elif key == "name":
                 cell = _NameCell(self.frame, bg, min_w, font_family)
                 cell.frame.pack(side="left", fill="both", expand=True, padx=(CELL_PAD, 0))
             else:
@@ -139,7 +142,12 @@ class _PoolRow:
         nicked  = player.get("nicked", False)
         error   = player.get("error")
         for key, cell in self._cells:
-            if key == "name":
+            if key == "head":
+                if loading:
+                    cell.set_loading(self._bg)
+                else:
+                    cell.set_image(player.get("head_path"), self._bg)
+            elif key == "name":
                 if loading:
                     cell.set_loading(self._bg)
                 else:
@@ -213,6 +221,40 @@ class _NameCell:
         for w in (self._rank, self._name, self._nick):
             w.pack_forget()
             w.configure(bg=bg)
+
+
+# Fixed-width cell that displays a player head avatar image
+class _HeadCell:
+    def __init__(self, parent, bg: str, width: int) -> None:
+        self._photo = None  # hold reference to prevent GC
+        self.wrapper = tk.Frame(parent, bg=bg, width=width)
+        self.wrapper.pack_propagate(False)
+        self.label = tk.Label(self.wrapper, bg=bg, anchor="center", bd=0, highlightthickness=0)
+        self.label.pack(fill="both", expand=True)
+
+    def set_image(self, path: "str | None", bg: str) -> None:
+        self.wrapper.configure(bg=bg)
+        self.label.configure(bg=bg)
+        if path:
+            try:
+                photo = tk.PhotoImage(file=path)
+                self._photo = photo
+                self.label.configure(image=photo, text="")
+                return
+            except Exception:
+                pass
+        self._photo = None
+        self.label.configure(image="", text="")
+
+    def set_loading(self, bg: str) -> None:
+        self.set_image(None, bg)
+
+    def set_bg(self, bg: str) -> None:
+        self.wrapper.configure(bg=bg)
+        self.label.configure(bg=bg)
+
+    def set_font(self, family: str) -> None:
+        pass  # no text in this cell
 
 
 # Fixed-width wrapper frame containing a single data label

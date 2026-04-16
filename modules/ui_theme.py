@@ -32,6 +32,7 @@ SCROLLBAR_W = 14   # width reserved on header right to align with CTkScrollableF
 
 # Each column: (data key, header label, min width, stretch, text anchor)
 COLUMNS = [
+    ("head",      "",       28, False, "center"),
     ("name",      "Player", 140, True,  "w"),
     ("stars",     "Stars",   68, False, "center"),
     ("fkdr",      "FKDR",    68, False, "center"),

@@ -3,13 +3,13 @@
 import threading
 import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import List
 
 import customtkinter as ctk
 
-from pathlib import Path
-
-from . import api
+from . import api_hypixel as api
+from . import api_heads
 from . import config
 from . import parser as bw_parser
 from .hotkey import HotkeyManager
@@ -184,6 +184,7 @@ class App(ctk.CTk):
             self._set_status("No API key – open Settings first")
             return
 
+        api_heads.clear_cache()
         self._players = [{"name": n, "loading": True} for n in names]
         self._table.set_players(self._players)
         self._fit_to_players(len(names))
@@ -202,10 +203,17 @@ class App(ctk.CTk):
     def _fetch_one(self, api_key: str, name: str) -> dict:
         player_data, err = api.fetch_player(api_key, name)
         if err:
-            return {"name": name, "error": err, "nicked": False}
-        stats = bw_parser.parse_bedwars(player_data)
-        stats["name"] = name
-        return stats
+            result = {"name": name, "error": err, "nicked": False}
+        else:
+            stats = bw_parser.parse_bedwars(player_data)
+            stats["name"] = name
+            result = stats
+
+        head_path = api_heads.fetch_head(name)
+        if head_path:
+            result["head_path"] = head_path
+
+        return result
 
     # Called on the main thread when a single player's fetch completes
     def _on_fetched(self, name: str, future) -> None:

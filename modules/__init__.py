@@ -1,6 +1,7 @@
 # All modules imports
 
-from .api import *
+from .api_hypixel import *
+from .api_heads import *
 from .config import *
 from .hotkey import *
 from .log_watcher import *
