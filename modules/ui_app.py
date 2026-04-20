@@ -14,6 +14,7 @@ from . import config
 from . import parser as bw_parser
 from .hotkey import HotkeyManager
 from .log_watcher import LogWatcher
+from . import log
 from .ui_table import PlayerTable
 from .ui_settings import SettingsDialog
 from .ui_theme import (
@@ -183,6 +184,7 @@ class App(ctk.CTk):
         if not api_key:
             self._set_status("No API key – open Settings first")
             return
+        log.who_detected(names, self._cfg.get("log_path", "latest.log"))
 
         api_heads.clear_cache()
         self._players = [{"name": n, "loading": True} for n in names]
@@ -203,10 +205,12 @@ class App(ctk.CTk):
     def _fetch_one(self, api_key: str, name: str) -> dict:
         player_data, err = api.fetch_player(api_key, name)
         if err:
+            log.api_error(name, err)
             result = {"name": name, "error": err, "nicked": False}
         else:
             stats = bw_parser.parse_bedwars(player_data)
             stats["name"] = name
+            log.api_player_fetched(stats)
             result = stats
 
         head_path = api_heads.fetch_head(name)
